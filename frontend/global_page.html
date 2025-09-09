@@ -1,0 +1,1313 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Global Patient Database - Health Risk System</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url('https://images.unsplash.com/photo-1615840636404-0f2412fd2732?q=80&w=406&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    /* body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      max-width: 1400px; 
+      margin: 20px auto; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    } */
+    .container {
+      background: rgb(197, 224, 242);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+       width: 100%;
+    }
+    h1{ 
+      font-size: 28px; 
+      color: #333;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .nav-button {
+      background: linear-gradient(45deg, #6c757d, #495057);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    
+    .nav-button:hover {
+      transform: translateY(-2px);
+    }
+    
+    .nav-button.chatbot {
+      background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    }
+    
+    .back-button {
+      background: linear-gradient(45deg, #6c757d, #495057);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: transform 0.2s;
+      margin-bottom: 20px;
+    }
+    
+    .back-button:hover {
+      transform: translateY(-2px);
+    }
+    
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg,#0b8ddf, #20beea 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .stat-card h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .stat-card .value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .patients-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+    
+    .patient-card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 4px solid #3498db;
+      transition: transform 0.2s;
+    }
+    
+    .patient-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .patient-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .patient-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .patient-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .patient-id {
+      font-size: 12px;
+      color: #666;
+      background: #e9ecef;
+      padding: 4px 8px;
+      border-radius: 12px;
+    }
+    
+    .patient-sex {
+      font-size: 12px;
+      color: #667eea;
+      font-weight: 600;
+      background: #e3f2fd;
+      padding: 4px 8px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .patient-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .risk-indicator {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    
+    .risk-low { background: #d4edda; color: #155724; }
+    .risk-medium { background: #fff3cd; color: #856404; }
+    .risk-high { background: #f8d7da; color: #721c24; }
+    
+    .view-details-btn {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .view-details-btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    .delete-btn {
+      background: linear-gradient(45deg, #e74c3c, #c0392b);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      width: 100%;
+      margin-top: 5px;
+    }
+    
+    .delete-btn:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(45deg, #c0392b, #a93226);
+    }
+    
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover {
+      color: #000;
+    }
+    
+    .chart-container {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      height: 400px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .error {
+      color: #e74c3c;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    /* Human Figure Styles */
+    .human-figure-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .human-figure-container {
+        flex-direction: column;
+        padding: 15px;
+      }
+      
+      .human-figure {
+        width: 250px;
+        height: 400px;
+      }
+      
+      .health-details {
+        margin-left: 0;
+        margin-top: 20px;
+        min-width: 280px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .human-figure {
+        width: 200px;
+        height: 350px;
+      }
+      
+      .health-details {
+        min-width: 250px;
+        padding: 15px;
+      }
+    }
+    
+    .human-figure {
+      width: 300px;
+      height: 500px;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .premium-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .avatar-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .avatar-circle::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+      transform: rotate(45deg);
+      transition: all 0.6s ease;
+    }
+    
+    .avatar-circle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4);
+    }
+    
+    .avatar-circle:hover::before {
+      transform: rotate(45deg) translate(100%, 100%);
+    }
+    
+    .avatar-initials {
+      font-size: 72px;
+      font-weight: 300;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      letter-spacing: 2px;
+    }
+    
+    .body-part {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      transform-origin: center;
+    }
+    
+    .body-part:hover {
+      filter: brightness(1.2) drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+      transform: scale(1.05);
+    }
+    
+    .body-part.active {
+      filter: brightness(1.3) drop-shadow(0 6px 12px rgba(0,0,0,0.3));
+      transform: scale(1.1);
+      animation: activePulse 1.5s ease-in-out infinite;
+    }
+    
+    .wireframe {
+      filter: drop-shadow(0 0 8px rgba(135, 206, 235, 0.3));
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .wireframe:hover {
+      filter: drop-shadow(0 0 12px rgba(135, 206, 235, 0.6)) brightness(1.2);
+      transform: scale(1.05);
+    }
+    
+    .wireframe.active {
+      filter: drop-shadow(0 0 16px rgba(135, 206, 235, 0.8)) brightness(1.4);
+      transform: scale(1.1);
+      animation: wireframePulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes wireframePulse {
+      0%, 100% { 
+        filter: drop-shadow(0 0 16px rgba(135, 206, 235, 0.8)) brightness(1.4);
+      }
+      50% { 
+        filter: drop-shadow(0 0 20px rgba(135, 206, 235, 1)) brightness(1.6);
+      }
+    }
+    
+    @keyframes activePulse {
+      0%, 100% { transform: scale(1.1); }
+      50% { transform: scale(1.15); }
+    }
+    
+    .health-details {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-left: 30px;
+      min-width: 300px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-left: 4px solid #667eea;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s ease;
+    }
+    
+    .health-details.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .health-details h3 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .health-metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .health-metric:last-child {
+      border-bottom: none;
+    }
+    
+    .metric-label {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+    
+    .metric-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .metric-value.high {
+      color: #e74c3c;
+    }
+    
+    .metric-value.medium {
+      color: #f39c12;
+    }
+    
+    .metric-value.low {
+      color: #27ae60;
+    }
+    
+    .search-results-figure {
+      display: none;
+      margin-top: 20px;
+    }
+    
+    .search-results-figure.show {
+      display: block;
+    }
+    
+    .patient-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 auto 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .emoji-indicator {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      font-size: 24px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #87ceeb;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      animation: emojiFloat 2s ease-in-out infinite;
+    }
+    
+    @keyframes emojiFloat {
+      0%, 100% { 
+        transform: translateY(0px);
+      }
+      50% { 
+        transform: translateY(-3px);
+      }
+    }
+    
+    /* Tooltip styles */
+    .body-part[title] {
+      position: relative;
+    }
+    
+    .body-part[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 1000;
+      pointer-events: none;
+      animation: tooltipFadeIn 0.3s ease;
+    }
+    
+    @keyframes tooltipFadeIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(5px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    
+    /* Enhanced search results styling */
+    .search-results-figure {
+      animation: slideInUp 0.5s ease-out;
+    }
+    
+    @keyframes slideInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+    
+    /* Loading animation for health details */
+    .health-details.loading {
+      position: relative;
+    }
+    
+    .health-details.loading::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Authentication Check -->
+  <script>
+    // Check if user is authenticated
+    if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+      // User is not authenticated, redirect to login
+      window.location.href = '/login';
+    }
+  </script>
+  <div class="container">
+    <button class="back-button" onclick="window.location.href='/dashboard'">← Back to Dashboard</button>
+    
+    <div class="header-nav">
+      <h1 style="margin: 0;">Global Patient Database</h1>
+      <div class="nav-buttons">
+        <a href="/dashboard" class="nav-button"> Dashboard</a>
+        <button onclick="logout()" class="nav-button" style="background: linear-gradient(45deg, #f4796b, #e9695b); border: none; cursor: pointer;">Logout</button>
+      </div>
+    </div>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">
+      View all patients who have used the health risk prediction system
+    </p>
+    
+    <!-- AI Global Analysis -->
+    <div class="insights" style="background: #f0f8ff; margin-bottom: 30px;">
+      <h3>AI Global Health Analysis</h3>
+      <div id="globalAIExplanation">
+        <p style="color: #666; font-style: italic;">AI analysis will appear here after loading patient data...</p>
+      </div>
+      <button id="refreshGlobalAI" style="background: linear-gradient(45deg, #4CAF50, #45a049); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-top: 10px; font-size: 12px;">
+        Refresh AI Analysis
+      </button>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 4px solid #667eea;">
+      <h3 style="margin: 0 0 15px 0; color: #333;">Search Patients</h3>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search by patient name..." 
+          style="flex: 1; min-width: 250px; padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 25px; font-size: 14px; outline: none; transition: border-color 0.3s;"
+          onkeyup="searchPatients()"
+        />
+        <button 
+          id="clearSearchBtn" 
+          onclick="clearSearch()" 
+          style="background: linear-gradient(45deg, #6c757d, #495057); color: white; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-size: 14px; font-weight: 600; transition: transform 0.2s;"
+        >
+          Clear
+        </button>
+      </div>
+      <div id="searchResults" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
+    </div>
+    
+    <!-- Human Figure Display for Search Results -->
+    <div id="searchResultsFigure" class="search-results-figure">
+      <div class="human-figure-container">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div class="human-figure" id="humanFigure">
+            <div class="premium-avatar">
+              <div class="avatar-circle">
+                <div class="avatar-initials" id="patientInitials">P</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="health-details" id="healthDetails">
+          <h3>Patient Health Overview</h3>
+          <div id="healthMetrics">
+            <p style="text-align: center; color: #666; font-style: italic;">Click on a body part to view health details</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Overview Stats -->
+    <div class="stats-overview">
+      <div class="stat-card">
+        <h3>Total Patients</h3>
+        <div class="value" id="totalPatients">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Total Records</h3>
+        <div class="value" id="totalRecords">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Avg Risk Score</h3>
+        <div class="value" id="avgRiskScore">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>High Risk Patients</h3>
+        <div class="value" id="highRiskPatients">-</div>
+      </div>
+    </div>
+    
+    <!-- Patients Grid -->
+    <div id="patientsContainer">
+      <div class="loading">Loading patient data...</div>
+    </div>
+  </div>
+
+  <!-- Patient Details Modal -->
+  <div id="patientModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalPatientName">Patient Details</h2>
+      <div id="modalContent">
+        <!-- Patient details will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allPatients = [];
+    let filteredPatients = [];
+    let modal = document.getElementById("patientModal");
+    let closeBtn = document.getElementsByClassName("close")[0];
+
+    // Close modal when clicking X
+    closeBtn.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    // Load all patients data
+    async function loadPatients() {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/api/patients');
+        const patients = await response.json();
+        
+        if (response.ok) {
+          allPatients = patients;
+          filteredPatients = patients;
+          displayPatients(patients);
+          updateOverviewStats(patients);
+        } else {
+          document.getElementById('patientsContainer').innerHTML = 
+            '<div class="error">Error loading patient data: ' + patients.error + '</div>';
+        }
+      } catch (error) {
+        document.getElementById('patientsContainer').innerHTML = 
+          '<div class="error">Failed to load patient data: ' + error.message + '</div>';
+      }
+    }
+
+    function updateOverviewStats(patients) {
+      const totalPatients = patients.length;
+      const totalRecords = patients.reduce((sum, p) => sum + p.total_days, 0);
+      const avgRisk = patients.length > 0 ? 
+        (patients.reduce((sum, p) => sum + p.avg_risk, 0) / patients.length).toFixed(3) : 0;
+      const highRiskPatients = patients.filter(p => p.avg_risk > 0.5).length;
+
+      document.getElementById('totalPatients').textContent = totalPatients;
+      document.getElementById('totalRecords').textContent = totalRecords;
+      document.getElementById('avgRiskScore').textContent = avgRisk;
+      document.getElementById('highRiskPatients').textContent = highRiskPatients;
+      
+      // Load AI explanation for global data
+      loadGlobalAIExplanation();
+    }
+
+    function displayPatients(patients) {
+      const container = document.getElementById('patientsContainer');
+      
+      if (patients.length === 0) {
+        container.innerHTML = '<div class="loading">No patients found. Upload some data first!</div>';
+        return;
+      }
+
+      container.innerHTML = '<div class="patients-grid">' +
+        patients.map(patient => `
+          <div class="patient-card">
+            <div class="patient-header">
+              <div class="patient-name">${patient.name}</div>
+              <div class="patient-info">
+                <div class="patient-id">ID: ${patient.patient_id}</div>
+                <div class="patient-sex">${patient.sex}</div>
+              </div>
+            </div>
+            
+            <div class="patient-stats">
+              <div class="stat-item">
+                <div class="stat-label">Total Days</div>
+                <div class="stat-value">${patient.total_days}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Avg Risk</div>
+                <div class="stat-value">${patient.avg_risk}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Max Risk</div>
+                <div class="stat-value">${patient.max_risk}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Min Risk</div>
+                <div class="stat-value">${patient.min_risk}</div>
+              </div>
+            </div>
+            
+            <div class="risk-indicator ${getRiskClass(patient.avg_risk)}">
+              ${getRiskLevel(patient.avg_risk)} RISK
+            </div>
+            
+            <div class="button-group">
+              <button class="view-details-btn" onclick="viewPatientDetails('${patient.patient_id}')">
+                View 30-Day Trend
+              </button>
+              <button class="delete-btn" onclick="deletePatient('${patient.patient_id}', '${patient.name}')">
+                Delete Patient
+              </button>
+            </div>
+          </div>
+        `).join('') + '</div>';
+    }
+
+    function getRiskClass(avgRisk) {
+      if (avgRisk < 0.3) return 'risk-low';
+      if (avgRisk < 0.7) return 'risk-medium';
+      return 'risk-high';
+    }
+
+    function getRiskLevel(avgRisk) {
+      if (avgRisk < 0.3) return 'LOW';
+      if (avgRisk < 0.7) return 'MEDIUM';
+      return 'HIGH';
+    }
+
+    async function viewPatientDetails(patientId) {
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/api/patients/${patientId}/data`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          showPatientModal(data);
+        } else {
+          alert('Error loading patient details: ' + data.error);
+        }
+      } catch (error) {
+        alert('Failed to load patient details: ' + error.message);
+      }
+    }
+
+    function showPatientModal(data) {
+      const modal = document.getElementById('patientModal');
+      const modalPatientName = document.getElementById('modalPatientName');
+      const modalContent = document.getElementById('modalContent');
+      
+      modalPatientName.textContent = `${data.patient_info.name} - 30 Day Analysis`;
+      
+      const riskScores = data.daily_data.map(d => d.risk_score);
+      const labels = data.daily_data.map(d => `Day ${d.day}`);
+      
+      modalContent.innerHTML = `
+        <div class="chart-container">
+          <canvas id="patientChart"></canvas>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px;">
+          <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <div style="font-size: 12px; color: #666;">Average Risk</div>
+            <div style="font-size: 18px; font-weight: 600;">${(riskScores.reduce((a,b) => a+b, 0) / riskScores.length).toFixed(3)}</div>
+          </div>
+          <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <div style="font-size: 12px; color: #666;">Highest Risk</div>
+            <div style="font-size: 18px; font-weight: 600;">${Math.max(...riskScores).toFixed(3)}</div>
+          </div>
+          <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <div style="font-size: 12px; color: #666;">Lowest Risk</div>
+            <div style="font-size: 18px; font-weight: 600;">${Math.min(...riskScores).toFixed(3)}</div>
+          </div>
+          <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <div style="font-size: 12px; color: #666;">Last Updated</div>
+            <div style="font-size: 12px; font-weight: 600;">${new Date(data.patient_info.last_updated).toLocaleDateString()}</div>
+          </div>
+        </div>
+      `;
+      
+      modal.style.display = "block";
+      
+      // Draw chart
+      setTimeout(() => {
+        const ctx = document.getElementById('patientChart').getContext('2d');
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Risk Score",
+              data: riskScores,
+              borderColor: "rgb(75, 192, 192)",
+              backgroundColor: "rgba(75, 192, 192, 0.1)",
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top'
+              }
+            },
+            scales: {
+              x: { 
+                title: { 
+                  display: true, 
+                  text: "Day",
+                  font: { size: 14, weight: 'bold' }
+                }
+              },
+              y: { 
+                title: { 
+                  display: true, 
+                  text: "Risk Score (0-1)",
+                  font: { size: 14, weight: 'bold' }
+                },
+                min: 0,
+                max: 1
+              }
+            }
+          }
+        });
+      }, 100);
+    }
+
+    async function loadGlobalAIExplanation() {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/api/ai/explain-global');
+        const data = await response.json();
+        
+        if (response.ok) {
+          displayGlobalAIExplanation(data.explanation);
+        } else {
+          document.getElementById('globalAIExplanation').innerHTML = 
+            '<p style="color: #e74c3c;">AI explanation unavailable: ' + data.error + '</p>';
+        }
+      } catch (error) {
+        document.getElementById('globalAIExplanation').innerHTML = 
+          '<p style="color: #e74c3c;">Failed to load AI explanation: ' + error.message + '</p>';
+      }
+    }
+
+    function displayGlobalAIExplanation(explanation) {
+      const aiExplanationEl = document.getElementById('globalAIExplanation');
+      if (explanation) {
+        // Convert markdown-style formatting to HTML
+        let formattedExplanation = explanation
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          .replace(/\n\n/g, '</p><p>')
+          .replace(/\n/g, '<br>');
+        
+        aiExplanationEl.innerHTML = `
+          <div style="background: white; padding: 20px; border-radius: 8px; border-left: 3px solid #4CAF50;">
+            <div style="margin: 0; line-height: 1.6; color: #333; font-size: 14px;">
+              <p>${formattedExplanation}</p>
+            </div>
+          </div>
+        `;
+      } else {
+        aiExplanationEl.innerHTML = '<p style="color: #666; font-style: italic;">AI explanation not available.</p>';
+      }
+    }
+
+    // Add event listener for refresh AI button
+    document.addEventListener('DOMContentLoaded', function() {
+      const refreshBtn = document.getElementById('refreshGlobalAI');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+          loadGlobalAIExplanation();
+        });
+      }
+    });
+
+    // Delete patient function
+    async function deletePatient(patientId, patientName) {
+      // Show confirmation dialog
+      const confirmed = confirm(
+        `Are you sure you want to delete patient "${patientName}"?\n\n` +
+        `This will permanently remove:\n` +
+        `• Patient record\n` +
+        `• All daily health data\n` +
+        `• All risk scores\n\n` +
+        `This action cannot be undone!`
+      );
+      
+      if (!confirmed) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/api/patients/${patientId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          // Show success message
+          alert(`Success: ${result.message}`);
+          
+          // Reload the patients list
+          loadPatients();
+        } else {
+          alert(`Error deleting patient: ${result.error}`);
+        }
+      } catch (error) {
+        alert(`Failed to delete patient: ${error.message}`);
+      }
+    }
+
+    // Search functionality
+    function searchPatients() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      const searchResults = document.getElementById('searchResults');
+      const searchResultsFigure = document.getElementById('searchResultsFigure');
+      
+      if (searchTerm === '') {
+        // Show all patients if search is empty
+        filteredPatients = allPatients;
+        searchResults.innerHTML = '';
+        searchResultsFigure.classList.remove('show');
+      } else {
+        // Filter patients by name
+        filteredPatients = allPatients.filter(patient => 
+          patient.name.toLowerCase().includes(searchTerm)
+        );
+        
+        // Update search results indicator
+        const totalResults = filteredPatients.length;
+        const totalPatients = allPatients.length;
+        
+        if (totalResults === 0) {
+          searchResults.innerHTML = `<span style="color: #e74c3c;">No patients found matching "${searchTerm}"</span>`;
+          searchResultsFigure.classList.remove('show');
+        } else if (totalResults === totalPatients) {
+          searchResults.innerHTML = `<span style="color: #28a745;">Showing all ${totalPatients} patients</span>`;
+          searchResultsFigure.classList.remove('show');
+        } else {
+          searchResults.innerHTML = `<span style="color: #667eea;">Found ${totalResults} of ${totalPatients} patients matching "${searchTerm}"</span>`;
+          // Show human figure for single patient search
+          if (totalResults === 1) {
+            showPatientFigure(filteredPatients[0]);
+            searchResultsFigure.classList.add('show');
+          } else {
+            searchResultsFigure.classList.remove('show');
+          }
+        }
+      }
+      
+      // Update the display with filtered results
+      displayPatients(filteredPatients);
+      updateOverviewStats(filteredPatients);
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchResults').innerHTML = '';
+      document.getElementById('searchResultsFigure').classList.remove('show');
+      filteredPatients = allPatients;
+      displayPatients(allPatients);
+      updateOverviewStats(allPatients);
+    }
+
+    // Human Figure Functions
+    let currentPatient = null;
+
+    function showPatientFigure(patient) {
+      currentPatient = patient;
+      
+      // Update patient initials
+      const initialsElement = document.getElementById('patientInitials');
+      if (initialsElement && patient.name) {
+        const initials = patient.name.split(' ').map(name => name.charAt(0)).join('').toUpperCase();
+        initialsElement.textContent = initials || 'P';
+      }
+      
+      // Show health details
+      showHealthDetails('overview');
+    }
+
+    function showHealthDetails(bodyPart) {
+      if (!currentPatient) return;
+      
+      const healthDetails = document.getElementById('healthDetails');
+      const healthMetrics = document.getElementById('healthMetrics');
+      
+      // Add loading animation
+      healthDetails.classList.add('loading');
+      
+      // Remove active class from all body parts
+      document.querySelectorAll('.body-part').forEach(part => {
+        part.classList.remove('active');
+      });
+      
+      // Add active class to selected body part
+      if (bodyPart !== 'overview') {
+        const selectedPart = document.querySelector(`[data-part="${bodyPart}"]`);
+        if (selectedPart) {
+          selectedPart.classList.add('active');
+        }
+      }
+      
+      // Simulate loading delay for better UX
+      setTimeout(() => {
+        healthDetails.classList.remove('loading');
+        
+        let metrics = [];
+        let title = 'Patient Health Overview';
+      
+      switch (bodyPart) {
+        case 'head':
+        case 'brain':
+          title = 'Brain & Cognitive Health';
+          metrics = [
+            { label: 'Mental Health Risk', value: (currentPatient.avg_risk * 0.8).toFixed(3), level: getRiskLevel(currentPatient.avg_risk * 0.8) },
+            { label: 'Stress Level', value: (currentPatient.avg_risk * 1.2).toFixed(3), level: getRiskLevel(currentPatient.avg_risk * 1.2) },
+            { label: 'Sleep Quality', value: (1 - currentPatient.avg_risk).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk) }
+          ];
+          break;
+        case 'heart':
+          title = 'Cardiovascular Health';
+          metrics = [
+            { label: 'Heart Disease Risk', value: currentPatient.avg_risk.toFixed(3), level: getRiskLevel(currentPatient.avg_risk) },
+            { label: 'Blood Pressure Risk', value: (currentPatient.avg_risk * 1.1).toFixed(3), level: getRiskLevel(currentPatient.avg_risk * 1.1) },
+            { label: 'Cholesterol Risk', value: (currentPatient.avg_risk * 0.9).toFixed(3), level: getRiskLevel(currentPatient.avg_risk * 0.9) }
+          ];
+          break;
+        case 'lungs':
+          title = '🫁 Respiratory Health';
+          metrics = [
+            { label: 'Lung Disease Risk', value: (currentPatient.avg_risk * 0.7).toFixed(3), level: getRiskLevel(currentPatient.avg_risk * 0.7) },
+            { label: 'Breathing Capacity', value: (1 - currentPatient.avg_risk * 0.8).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.8) },
+            { label: 'Oxygen Saturation', value: (1 - currentPatient.avg_risk * 0.5).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.5) }
+          ];
+          break;
+        case 'torso':
+          title = '🫀 Overall Body Health';
+          metrics = [
+            { label: 'Overall Risk Score', value: currentPatient.avg_risk.toFixed(3), level: getRiskLevel(currentPatient.avg_risk) },
+            { label: 'BMI Risk', value: (currentPatient.avg_risk * 1.2).toFixed(3), level: getRiskLevel(currentPatient.avg_risk * 1.2) },
+            { label: 'Metabolic Health', value: (1 - currentPatient.avg_risk * 0.6).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.6) }
+          ];
+          break;
+        case 'left-arm':
+        case 'right-arm':
+        case 'left-hand':
+        case 'right-hand':
+          title = '💪 Upper Body Health';
+          metrics = [
+            { label: 'Muscle Strength', value: (1 - currentPatient.avg_risk * 0.4).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.4) },
+            { label: 'Joint Health', value: (1 - currentPatient.avg_risk * 0.7).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.7) },
+            { label: 'Circulation', value: (1 - currentPatient.avg_risk * 0.8).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.8) }
+          ];
+          break;
+        case 'left-leg':
+        case 'right-leg':
+        case 'left-foot':
+        case 'right-foot':
+          title = '🦵 Lower Body Health';
+          metrics = [
+            { label: 'Mobility', value: (1 - currentPatient.avg_risk * 0.5).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.5) },
+            { label: 'Bone Density', value: (1 - currentPatient.avg_risk * 0.6).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.6) },
+            { label: 'Balance', value: (1 - currentPatient.avg_risk * 0.9).toFixed(3), level: getRiskLevel(1 - currentPatient.avg_risk * 0.9) }
+          ];
+          break;
+        default:
+          title = `${currentPatient.name} - Health Overview`;
+          metrics = [
+            { label: 'Patient ID', value: currentPatient.patient_id, level: 'info' },
+            { label: 'Gender', value: currentPatient.sex, level: 'info' },
+            { label: 'Total Days', value: currentPatient.total_days, level: 'info' },
+            { label: 'Average Risk', value: currentPatient.avg_risk.toFixed(3), level: getRiskLevel(currentPatient.avg_risk) },
+            { label: 'Max Risk', value: currentPatient.max_risk.toFixed(3), level: getRiskLevel(currentPatient.max_risk) },
+            { label: 'Min Risk', value: currentPatient.min_risk.toFixed(3), level: getRiskLevel(currentPatient.min_risk) }
+          ];
+      }
+      
+      healthDetails.querySelector('h3').textContent = title;
+      
+      healthMetrics.innerHTML = metrics.map(metric => `
+        <div class="health-metric">
+          <span class="metric-label">${metric.label}</span>
+          <span class="metric-value ${metric.level === 'info' ? '' : metric.level.toLowerCase()}">${metric.value}</span>
+        </div>
+      `).join('');
+      
+        healthDetails.classList.add('show');
+      }, 300); // 300ms loading delay
+    }
+
+    // Initialize human figure interactions
+    function initializeHumanFigure() {
+      const bodyParts = document.querySelectorAll('.body-part');
+      bodyParts.forEach(part => {
+        part.addEventListener('click', function() {
+          const bodyPart = this.getAttribute('data-part');
+          showHealthDetails(bodyPart);
+        });
+        
+        part.addEventListener('mouseenter', function() {
+          this.style.filter = 'brightness(1.2)';
+        });
+        
+        part.addEventListener('mouseleave', function() {
+          if (!this.classList.contains('active')) {
+            this.style.filter = 'brightness(1)';
+          }
+        });
+      });
+    }
+
+    // Add focus styling to search input and initialize human figure
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('focus', function() {
+          this.style.borderColor = '#667eea';
+        });
+        searchInput.addEventListener('blur', function() {
+          this.style.borderColor = '#e9ecef';
+        });
+      }
+      
+      // Initialize human figure interactions
+      initializeHumanFigure();
+    });
+
+    // Logout function
+    async function logout() {
+      try {
+        // Call logout API to clear server-side session
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+      } catch (error) {
+        console.error('Logout API error:', error);
+      }
+      
+      // Clear session storage
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('isAuthenticated');
+      
+      // Redirect to login page
+      window.location.href = '/login';
+    }
+
+    // Load patients when page loads
+    loadPatients();
+  </script>
+</body>
+</html>

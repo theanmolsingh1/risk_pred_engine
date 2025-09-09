@@ -1,0 +1,879 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard - Health Risk Prediction System</title>
+  <style>
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url('https://images.unsplash.com/photo-1615840636404-0f2412fd2732?q=80&w=406&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+
+    /* body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    } */
+    
+    .dashboard-container {
+      background: rgb(197, 224, 242);
+      border-radius: 20px;
+      padding: 60px 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 10000px;
+      width: 80%;
+    }
+    
+    .user-info {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border-left: 4px solid #28a745;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .user-details {
+      text-align: left;
+    }
+    
+    .user-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .user-email {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      position: relative;
+    }
+    
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 25px;
+      transition: background-color 0.2s;
+    }
+    
+    .profile-info:hover {
+      background-color: rgba(214, 21, 21, 0.05);
+    }
+    
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .profile-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .profile-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+    
+    .profile-position {
+      font-size: 12px;
+      color: #666;
+      margin: 0;
+    }
+    
+    .profile-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 15px 0;
+      min-width: 250px;
+      z-index: 1000;
+      display: none;
+      border: 1px solid #e1e5e9;
+    }
+    
+    .profile-dropdown.show {
+      display: block;
+    }
+    
+    .dropdown-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+    
+    .dropdown-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .dropdown-divider {
+      height: 1px;
+      background-color: #e1e5e9;
+      margin: 8px 0;
+    }
+    
+    .logout-btn {
+      background: linear-gradient(45deg, #e57b70, #ec7567);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    
+    .logout-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .logo {
+      font-size: 4rem;
+      margin-bottom: 20px;
+    }
+    
+    h1 { 
+      font-size: 2.5rem; 
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+    
+    .feature-card {
+      background: linear-gradient(135deg, #0b8ddf, #20beea 100%);
+      color: rgb(255, 255, 255);
+      padding: 30px 20px;
+      border-radius: 15px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+    
+    .feature-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .feature-desc {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .cta-button {
+      background: linear-gradient(45deg, #0b8ddf, #20beea);
+      color: rgb(232, 221, 221);
+      border: none;
+      padding: 18px 40px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      margin: 10px;
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .cta-button.global {
+      background: linear-gradient(45deg, #0b8ddf, #20beea);
+    }
+    
+    .cta-button.chatbot {
+      background: linear-gradient(45deg, #0b8ddf, #20beea);
+    }
+    
+    .info-section {
+      background: #bae1e4;
+      padding: 30px;
+      border-radius: 15px;
+      margin-top: 40px;
+      text-align: left;
+    }
+    
+    .info-section h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+    }
+    
+    .info-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .info-section li {
+      padding: 8px 0;
+      color: #666;
+      position: relative;
+      padding-left: 25px;
+    }
+    
+    .info-section li:before {
+      content: "✓";
+      color: #27ae60;
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+    
+    .access-denied {
+      display: none;
+      background: #f8d7da;
+      color: #721c24;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      border-left: 4px solid #e74c3c;
+    }
+    
+    /* Profile Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .modal-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+    
+    .close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    .close:hover {
+      color: #000;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+      box-sizing: border-box;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .form-group input:disabled {
+      background-color: #f8f9fa;
+      color: #666;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+      margin-top: 25px;
+    }
+    
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    
+    .btn-danger {
+      background: linear-gradient(45deg, #e74c3c, #c0392b);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+    }
+    
+    .password-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .password-section h4 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- User Info Section -->
+    <div class="user-info" id="userInfo" style="display: none;">
+      <div class="user-details">
+        <div class="user-name" id="userName">Welcome!</div>
+        <div class="user-email" id="userEmail">user@example.com</div>
+      </div>
+      <div class="profile-section">
+        <div class="profile-info" onclick="toggleProfileDropdown()">
+          <div class="profile-avatar" id="profileAvatar">U</div>
+          <div class="profile-text">
+            <div class="profile-name" id="profileName">User Name</div>
+            <div class="profile-position" id="profilePosition">Healthcare Professional</div>
+          </div>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="dropdown-item" onclick="openProfileModal()">
+            View Profile
+          </div>
+          <div class="dropdown-item" onclick="openChangePasswordModal()">
+            Change Password
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" onclick="logout()" style="color: #e74c3c;">
+            Logout
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Access Denied Message -->
+    <div class="access-denied" id="accessDenied">
+      <h3>Access Denied</h3>
+      <p>You need to be logged in to access this dashboard. Please <a href="/login" style="color: #721c24; font-weight: bold;">click here to login</a>.</p>
+    </div>
+    
+    <!-- Main Dashboard Content -->
+    <div id="dashboardContent">
+      <div class="logo">Health System</div>
+      <h1>Health Risk Prediction System</h1>
+      <p class="subtitle">
+        Welcome to your personalized health analytics dashboard. 
+        Access advanced AI-powered healthcare insights and patient management tools.
+      </p>
+      
+      <div class="features">
+        <div class="feature-card" onclick="window.location.href='/local'">
+          <div class="feature-icon">Analytics</div>
+          <div class="feature-title">Risk Analysis</div>
+          <div class="feature-desc">Upload and analyze patient health data</div>
+        </div>
+        
+        <div class="feature-card" onclick="window.location.href='/global'">
+          <div class="feature-icon">Global</div>
+          <div class="feature-title">Global Database</div>
+          <div class="feature-desc">View all patients and trends</div>
+        </div>
+        
+        <div class="feature-card" onclick="window.location.href='/chatbot'">
+          <div class="feature-icon">AI</div>
+          <div class="feature-title">AI Chatbot</div>
+          <div class="feature-desc">Get AI-powered health insights</div>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        <a href="/local" class="cta-button">
+           Start Health Risk Analysis
+        </a>
+        <a href="/global" class="cta-button global">
+          View the Global Patient Database
+        </a>
+        <a href="/chatbot" class="cta-button chatbot">
+          AI Health Assistant
+        </a>
+      </div>
+      
+      <div class="info-section">
+        <h3>Dashboard Features:</h3>
+        <ul>
+          <li>Upload patient health data in CSV format</li>
+          <li>Get AI-powered risk predictions and analysis</li>
+          <li>View comprehensive patient trends and insights</li>
+          <li>Access global patient database with search functionality</li>
+          <li>Chat with AI assistant for health recommendations</li>
+          <li>Monitor patient progress with visual charts</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Profile Information</h2>
+        <span class="close" onclick="closeProfileModal()">&times;</span>
+      </div>
+      
+      <div class="form-group">
+        <label for="profileFullName">Full Name:</label>
+        <input type="text" id="profileFullName" value="" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label for="profileUsername">Username:</label>
+        <input type="text" id="profileUsername" value="" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label for="profileEmail">Email:</label>
+        <input type="email" id="profileEmail" value="" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label for="profilePhone">Phone Number:</label>
+        <input type="tel" id="profilePhone" value="" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label for="profilePosition">Position in Hospital:</label>
+        <input type="text" id="profilePosition" value="" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label for="profileDepartment">Department:</label>
+        <input type="text" id="profileDepartment" value="" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label for="profileHospital">Hospital/Organization:</label>
+        <input type="text" id="profileHospital" value="" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label for="profileExperience">Years of Experience:</label>
+        <input type="text" id="profileExperience" value="" disabled>
+      </div>
+      
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeProfileModal()">Close</button>
+        <button class="btn btn-primary" onclick="editProfile()">Edit Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div id="changePasswordModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Change Password</h2>
+        <span class="close" onclick="closeChangePasswordModal()">&times;</span>
+      </div>
+      
+      <div class="form-group">
+        <label for="currentPassword">Current Password:</label>
+        <input type="password" id="currentPassword" placeholder="Enter current password">
+      </div>
+      
+      <div class="form-group">
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" placeholder="Enter new password" minlength="6">
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">Confirm New Password:</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm new password" minlength="6">
+      </div>
+      
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeChangePasswordModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="changePassword()">Change Password</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check authentication status
+    function checkAuth() {
+      const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+      const user = sessionStorage.getItem('user');
+      
+      if (isAuthenticated === 'true' && user) {
+        // User is authenticated, show dashboard
+        const userData = JSON.parse(user);
+        document.getElementById('userName').textContent = `Welcome, ${userData.full_name || userData.username}!`;
+        document.getElementById('userEmail').textContent = userData.email || 'No email provided';
+        
+        // Update profile section
+        updateProfileSection(userData);
+        
+        document.getElementById('userInfo').style.display = 'flex';
+        document.getElementById('dashboardContent').style.display = 'block';
+        document.getElementById('accessDenied').style.display = 'none';
+      } else {
+        // User is not authenticated, show access denied
+        document.getElementById('userInfo').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'none';
+        document.getElementById('accessDenied').style.display = 'block';
+      }
+    }
+    
+    // Update profile section with user data
+    function updateProfileSection(userData) {
+      const firstName = (userData.full_name || userData.username || 'User').split(' ')[0];
+      const avatar = firstName.charAt(0).toUpperCase();
+      
+      document.getElementById('profileAvatar').textContent = avatar;
+      document.getElementById('profileName').textContent = userData.full_name || userData.username || 'User Name';
+      document.getElementById('profilePosition').textContent = userData.position || 'Healthcare Professional';
+      
+      // Update profile modal fields
+      document.getElementById('profileFullName').value = userData.full_name || '';
+      document.getElementById('profileUsername').value = userData.username || '';
+      document.getElementById('profileEmail').value = userData.email || '';
+      document.getElementById('profilePhone').value = userData.phone || '';
+      document.getElementById('profilePosition').value = userData.position || '';
+      document.getElementById('profileDepartment').value = userData.department || '';
+      document.getElementById('profileHospital').value = userData.hospital || '';
+      document.getElementById('profileExperience').value = userData.experience || '';
+    }
+    
+    // Logout function
+    async function logout() {
+      try {
+        // Call logout API to clear server-side session
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+      } catch (error) {
+        console.error('Logout API error:', error);
+      }
+      
+      // Clear session storage
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('isAuthenticated');
+      
+      // Redirect to login page
+      window.location.href = '/login';
+    }
+    
+    // Profile dropdown functions
+    function toggleProfileDropdown() {
+      const dropdown = document.getElementById('profileDropdown');
+      dropdown.classList.toggle('show');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('profileDropdown');
+      const profileInfo = document.querySelector('.profile-info');
+      
+      if (!profileInfo.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+    
+    // Profile modal functions
+    function openProfileModal() {
+      document.getElementById('profileModal').style.display = 'block';
+      document.getElementById('profileDropdown').classList.remove('show');
+    }
+    
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+    }
+    
+    function editProfile() {
+      const inputs = document.querySelectorAll('#profileModal input');
+      const editBtn = document.querySelector('#profileModal .btn-danger, #profileModal .btn-primary');
+      
+      if (editBtn.textContent === 'Edit Profile') {
+        // Enable editing
+        inputs.forEach(input => {
+          if (input.id !== 'profileUsername') { // Don't allow username editing
+            input.disabled = false;
+          }
+        });
+        editBtn.textContent = 'Save Changes';
+        editBtn.classList.remove('btn-primary');
+        editBtn.classList.add('btn-danger');
+      } else {
+        // Save changes
+        saveProfileChanges();
+      }
+    }
+    
+    async function saveProfileChanges() {
+      const fullName = document.getElementById('profileFullName').value;
+      const email = document.getElementById('profileEmail').value;
+      const phone = document.getElementById('profilePhone').value;
+      const position = document.getElementById('profilePosition').value;
+      const department = document.getElementById('profileDepartment').value;
+      const hospital = document.getElementById('profileHospital').value;
+      const experience = document.getElementById('profileExperience').value;
+      
+      try {
+        // Send data to backend
+        const response = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            full_name: fullName,
+            email: email,
+            phone: phone,
+            position: position,
+            department: department,
+            hospital: hospital,
+            experience: experience
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Update local session storage
+          const userData = JSON.parse(sessionStorage.getItem('user'));
+          userData.full_name = fullName;
+          userData.email = email;
+          userData.phone = phone;
+          userData.position = position;
+          userData.department = department;
+          userData.hospital = hospital;
+          userData.experience = experience;
+          sessionStorage.setItem('user', JSON.stringify(userData));
+          
+          // Update the profile section
+          updateProfileSection(userData);
+          
+          // Reset form
+          const inputs = document.querySelectorAll('#profileModal input');
+          inputs.forEach(input => input.disabled = true);
+          
+          const editBtn = document.querySelector('#profileModal .btn-danger, #profileModal .btn-primary');
+          editBtn.textContent = 'Edit Profile';
+          editBtn.classList.remove('btn-danger');
+          editBtn.classList.add('btn-primary');
+          
+          alert('Profile updated successfully!');
+          closeProfileModal();
+        } else {
+          alert('Error updating profile: ' + data.error);
+        }
+      } catch (error) {
+        alert('Error updating profile: ' + error.message);
+      }
+    }
+    
+    // Change password modal functions
+    function openChangePasswordModal() {
+      document.getElementById('changePasswordModal').style.display = 'block';
+      document.getElementById('profileDropdown').classList.remove('show');
+      
+      // Clear form
+      document.getElementById('currentPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmPassword').value = '';
+    }
+    
+    function closeChangePasswordModal() {
+      document.getElementById('changePasswordModal').style.display = 'none';
+    }
+    
+    async function changePassword() {
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        alert('New passwords do not match');
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        alert('New password must be at least 6 characters long');
+        return;
+      }
+      
+      try {
+        // Send data to backend
+        const response = await fetch('/api/auth/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Password changed successfully!');
+          closeChangePasswordModal();
+        } else {
+          alert('Error changing password: ' + data.error);
+        }
+      } catch (error) {
+        alert('Error changing password: ' + error.message);
+      }
+    }
+    
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+      const profileModal = document.getElementById('profileModal');
+      const changePasswordModal = document.getElementById('changePasswordModal');
+      
+      if (event.target === profileModal) {
+        closeProfileModal();
+      }
+      if (event.target === changePasswordModal) {
+        closeChangePasswordModal();
+      }
+    }
+    
+    // Check authentication when page loads
+    window.onload = function() {
+      checkAuth();
+    }
+  </script>
+</body>
+</html>

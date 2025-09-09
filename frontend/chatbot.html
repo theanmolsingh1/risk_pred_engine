@@ -1,0 +1,627 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>AI Health Assistant - Interactive Chatbot</title>
+  <style>
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url('https://images.unsplash.com/photo-1615840636404-0f2412fd2732?q=80&w=406&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed;
+      background-size: cover;
+    }
+    /* body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px; */
+    /* } */
+    
+    .container {
+      background: rgb(197, 224, 242);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      height: calc(100vh - 40px);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    h1 { 
+      font-size: 28px; 
+      color: #333;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .back-button {
+      background: linear-gradient(45deg, #6c757d, #495057);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: transform 0.2s;
+      text-decoration: none;
+    }
+    
+    .back-button:hover {
+      transform: translateY(-2px);
+    }
+    
+    .chat-container {
+      display: flex;
+      flex: 1;
+      gap: 20px;
+      min-height: 0;
+    }
+    
+    .sidebar {
+      width: 300px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .sidebar h3 {
+      margin-top: 0;
+      color: #333;
+      font-size: 18px;
+    }
+    
+    .patient-selector {
+      margin-bottom: 20px;
+    }
+    
+    .patient-selector label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+    }
+    
+    .patient-selector select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      background: rgb(186, 236, 231);
+    }
+    
+    .suggestions {
+      margin-bottom: 20px;
+    }
+    
+    .suggestion-item {
+      background: rgb(213, 229, 235);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    
+    .suggestion-item:hover {
+      background: #e3f2fd;
+      border-color: #2196f3;
+      transform: translateX(5px);
+    }
+    
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f8f9fa;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .message {
+      max-width: 80%;
+      padding: 15px 20px;
+      border-radius: 20px;
+      word-wrap: break-word;
+      line-height: 1.5;
+    }
+    
+    .message.user {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: rgb(245, 235, 235);
+      align-self: flex-end;
+      border-bottom-right-radius: 5px;
+    }
+    
+    .message.assistant {
+      background: rgb(247, 240, 240);
+      color: #333;
+      align-self: flex-start;
+      border: 1px solid #ddd;
+      border-bottom-left-radius: 5px;
+    }
+    
+    .message.assistant .timestamp {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      font-style: italic;
+    }
+    
+    .chat-input-container {
+      padding: 20px;
+      background: rgb(244, 239, 239);
+      border-top: 1px solid #ddd;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .chat-input {
+      flex: 1;
+      padding: 15px 20px;
+      border: 2px solid #ddd;
+      border-radius: 25px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    .chat-input:focus {
+      border-color: #667eea;
+    }
+    
+    .send-button {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: transform 0.2s;
+      min-width: 300px;
+    }
+    
+    .send-button:hover {
+      transform: translateY(-2px);
+    }
+    
+    .send-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      border-bottom-left-radius: 5px;
+      padding: 15px 20px;
+      max-width: 80%;
+    }
+    
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #667eea;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    
+    .welcome-message {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      margin: 20px 0;
+    }
+    
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    
+    .patient-summary {
+      background: rgb(168, 226, 233);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .patient-summary h3 {
+      margin-top: 0;
+      color: #333;
+      font-size: 16px;
+    }
+    
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .summary-label {
+      font-weight: 600;
+      color: #555;
+    }
+    
+    .summary-value {
+      color: #333;
+    }
+    
+    .risk-indicator {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .risk-low { background: #d4edda; color: #155724; }
+    .risk-medium { background: #fff3cd; color: #856404; }
+    .risk-high { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <!-- Authentication Check -->
+  <script>
+    // Check if user is authenticated
+    if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+      // User is not authenticated, redirect to login
+      window.location.href = '/login';
+    }
+  </script>
+  <div class="container">
+    <div class="header">
+      <h1>AI Health Assistant</h1>
+      <div style="display: flex; gap: 10px;">
+        <a href="/dashboard" class="back-button">Dashboard</a>
+        <button onclick="logout()" class="back-button" style="background: linear-gradient(45deg, #e74c3c, #c0392b); border: none; cursor: pointer;">Logout</button>
+      </div>
+    </div>
+    
+    <div class="chat-container">
+      <div class="sidebar">
+        <div class="patient-selector">
+          <label for="patientSelect">Select Patient (Optional):</label>
+          <select id="patientSelect">
+            <option value="">Global Analysis</option>
+          </select>
+          <button id="refreshPatients" style="margin-top: 10px; padding: 8px 15px; background: #8495e0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px;">
+            Refresh Patients
+          </button>
+        </div>
+        
+        <div id="patientSummary" class="patient-summary" style="display: none;">
+          <h3>Patient Summary</h3>
+          <div id="patientSummaryContent"></div>
+        </div>
+        
+        <div class="suggestions">
+          <h3>Suggested Questions</h3>
+          <div id="suggestionsList"></div>
+        </div>
+      </div>
+      
+      <div class="chat-area">
+        <div class="chat-messages" id="chatMessages">
+          <div class="welcome-message">
+            <br><br>
+            <strong>What I can help you with</strong>
+            <br>
+          </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+        
+        <div class="chat-input-container">
+          <input type="text" id="chatInput" class="chat-input" placeholder="Ask me about patient health data, trends, or specific concerns..." />
+          <button id="sendButton" class="send-button">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class HealthChatbot {
+      constructor() {
+        this.chatMessages = document.getElementById('chatMessages');
+        this.chatInput = document.getElementById('chatInput');
+        this.sendButton = document.getElementById('sendButton');
+        this.patientSelect = document.getElementById('patientSelect');
+        this.suggestionsList = document.getElementById('suggestionsList');
+        this.typingIndicator = document.getElementById('typingIndicator');
+        
+        this.initializeEventListeners();
+        this.loadPatients();
+        this.loadSuggestions();
+      }
+      
+      initializeEventListeners() {
+        this.sendButton.addEventListener('click', () => this.sendMessage());
+        this.chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            this.sendMessage();
+          }
+        });
+        
+        this.patientSelect.addEventListener('change', () => {
+          this.loadSuggestions();
+          this.loadPatientSummary();
+        });
+        
+        // Add refresh button functionality
+        const refreshButton = document.getElementById('refreshPatients');
+        refreshButton.addEventListener('click', () => {
+          this.loadPatients();
+        });
+      }
+      
+      async loadPatients() {
+        try {
+          const response = await fetch('/api/chatbot/patients');
+          const patients = await response.json();
+          
+          // Clear existing options except the first one
+          this.patientSelect.innerHTML = '<option value="">Global Analysis</option>';
+          
+          if (patients.length === 0) {
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "No patients found - Upload data first";
+            option.disabled = true;
+            this.patientSelect.appendChild(option);
+          } else {
+            patients.forEach(patient => {
+              const option = document.createElement('option');
+              option.value = patient.patient_id;
+              option.textContent = `${patient.name} (ID: ${patient.patient_id}) - Risk: ${patient.avg_risk}`;
+              this.patientSelect.appendChild(option);
+            });
+          }
+        } catch (error) {
+          console.error('Error loading patients:', error);
+          // Show error in dropdown
+          this.patientSelect.innerHTML = '<option value="">Error loading patients</option>';
+        }
+      }
+      
+      async loadSuggestions() {
+        try {
+          const response = await fetch('/api/chatbot/suggestions');
+          const suggestions = await response.json();
+          
+          const isPatientSelected = this.patientSelect.value !== '';
+          const suggestionType = isPatientSelected ? 'patient_specific' : 'global';
+          const suggestionItems = suggestions[suggestionType] || [];
+          
+          this.suggestionsList.innerHTML = '';
+          suggestionItems.forEach(suggestion => {
+            const item = document.createElement('div');
+            item.className = 'suggestion-item';
+            item.textContent = suggestion;
+            item.addEventListener('click', () => {
+              this.chatInput.value = suggestion;
+              this.sendMessage();
+            });
+            this.suggestionsList.appendChild(item);
+          });
+        } catch (error) {
+          console.error('Error loading suggestions:', error);
+        }
+      }
+      
+      async loadPatientSummary() {
+        const patientId = this.patientSelect.value;
+        const patientSummary = document.getElementById('patientSummary');
+        const patientSummaryContent = document.getElementById('patientSummaryContent');
+        
+        if (!patientId) {
+          patientSummary.style.display = 'none';
+          return;
+        }
+        
+        try {
+          const response = await fetch(`/api/chatbot/patient/${patientId}/insights`);
+          const insights = await response.json();
+          
+          if (response.ok) {
+            const summary = insights.summary;
+            const riskLevel = summary.avg_risk < 0.3 ? 'low' : summary.avg_risk < 0.7 ? 'medium' : 'high';
+            
+            patientSummaryContent.innerHTML = `
+              <div class="summary-item">
+                <span class="summary-label">Total Days:</span>
+                <span class="summary-value">${summary.total_days}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Avg Risk:</span>
+                <span class="summary-value">
+                  ${summary.avg_risk} 
+                  <span class="risk-indicator risk-${riskLevel}">${riskLevel.toUpperCase()}</span>
+                </span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Highest Risk:</span>
+                <span class="summary-value">${summary.max_risk}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">High Risk Days:</span>
+                <span class="summary-value">${summary.high_risk_days}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Trend:</span>
+                <span class="summary-value">${summary.trend}</span>
+              </div>
+            `;
+            patientSummary.style.display = 'block';
+          } else {
+            patientSummary.style.display = 'none';
+          }
+        } catch (error) {
+          console.error('Error loading patient summary:', error);
+          patientSummary.style.display = 'none';
+        }
+      }
+      
+      async sendMessage() {
+        const message = this.chatInput.value.trim();
+        if (!message) return;
+        
+        const selectedPatientId = this.patientSelect.value || null;
+        
+        // Add user message to chat
+        this.addMessage(message, 'user');
+        
+        // Clear input and disable send button
+        this.chatInput.value = '';
+        this.sendButton.disabled = true;
+        
+        // Show typing indicator
+        this.showTypingIndicator();
+        
+        try {
+          const response = await fetch('/api/chatbot/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              query: message,
+              patient_id: selectedPatientId
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            this.addMessage(data.response, 'assistant', data.timestamp);
+          } else {
+            this.addMessage(`Error: ${data.error}`, 'assistant');
+          }
+        } catch (error) {
+          this.addMessage(`Sorry, I encountered an error: ${error.message}`, 'assistant');
+        } finally {
+          this.hideTypingIndicator();
+          this.sendButton.disabled = false;
+          this.chatInput.focus();
+        }
+      }
+      
+      addMessage(content, sender, timestamp = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        if (sender === 'assistant') {
+          messageDiv.innerHTML = `
+            <div>${content}</div>
+            ${timestamp ? `<div class="timestamp">${new Date(timestamp).toLocaleString()}</div>` : ''}
+          `;
+        } else {
+          messageDiv.textContent = content;
+        }
+        
+        this.chatMessages.appendChild(messageDiv);
+        this.scrollToBottom();
+      }
+      
+      showTypingIndicator() {
+        this.typingIndicator.style.display = 'block';
+        this.scrollToBottom();
+      }
+      
+      hideTypingIndicator() {
+        this.typingIndicator.style.display = 'none';
+      }
+      
+      scrollToBottom() {
+        this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+      }
+    }
+    
+    // Logout function
+    async function logout() {
+      try {
+        // Call logout API to clear server-side session
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+      } catch (error) {
+        console.error('Logout API error:', error);
+      }
+      
+      // Clear session storage
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('isAuthenticated');
+      
+      // Redirect to login page
+      window.location.href = '/login';
+    }
+
+    // Initialize the chatbot when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      new HealthChatbot();
+    });
+  </script>
+</body>
+</html>
